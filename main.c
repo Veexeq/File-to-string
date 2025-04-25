@@ -45,14 +45,14 @@ char *file_to_string(FILE *file) {
     while ((buffer = getc(file)) != EOF) {
 
         // There is still place to insert a character
-        if (text.LEN < text.size) {
+        if (text.LEN > text.size) {
             text.plaintext[text.size++] = buffer;
         } 
 
         // No place left
         else {
-            text.size *= 2;
-            char *temp = realloc(text.plaintext, text.size);
+            text.LEN *= 2;
+            char *temp = realloc(text.plaintext, text.LEN);
             if (!temp) {
                 printf("REALLOCATION ERROR\n");
                 return NULL;
@@ -69,7 +69,13 @@ char *file_to_string(FILE *file) {
 
     // End of reading the file
     text.plaintext[text.size] = '\0';
-    return text.plaintext;
+    text.LEN = text.size + 1;
+    char *res = realloc(text.plaintext, text.LEN);
+    if (!res) {
+        printf("FINAL REALLOCATION ERROR\n");
+        return NULL;
+    }
+    return res;
 }
 
 // Count all the sentences (assuming sentences end with ". ")
