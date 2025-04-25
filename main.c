@@ -60,7 +60,7 @@ char *file_to_string(FILE *file) {
 
             // Correctly reallocated the memory
             text.plaintext = temp;
-            free(temp);
+            // free(temp);
 
             // Push read character back to the file
             ungetc(buffer, file);
