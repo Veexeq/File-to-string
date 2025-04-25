@@ -5,6 +5,7 @@
 
 int count_chars(FILE *file);
 int count_sentences(FILE *file);
+char *file_to_string(FILE *file);
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -19,11 +20,56 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    printf("Characters in file: %d\n", count_chars(file));
-    printf("Sentences in file: %d\n", count_sentences(file));
+    char *plaintext = NULL;
+    plaintext = file_to_string(file);
+    printf("%s\n", plaintext);
 
+    free(plaintext);
     fclose(file);
     return 0;
+}
+
+// Read from the file and put the text into a var
+char *file_to_string(FILE *file) {
+    struct {
+        char *plaintext;
+        size_t LEN;
+        size_t size;
+    } text;
+
+    text.plaintext = malloc(1024 * sizeof(char));
+    text.LEN = 1024;
+    text.size = 0;
+
+    char buffer = 0;
+    while ((buffer = getc(file)) != EOF) {
+
+        // There is still place to insert a character
+        if (text.LEN < text.size) {
+            text.plaintext[text.size++] = buffer;
+        } 
+
+        // No place left
+        else {
+            text.size *= 2;
+            char *temp = realloc(text.plaintext, text.size);
+            if (!temp) {
+                printf("REALLOCATION ERROR\n");
+                return NULL;
+            }
+
+            // Correctly reallocated the memory
+            text.plaintext = temp;
+            free(temp);
+
+            // Push read character back to the file
+            ungetc(buffer, file);
+        }
+    }
+
+    // End of reading the file
+    text.plaintext[text.size] = '\0';
+    return text.plaintext;
 }
 
 // Count all the sentences (assuming sentences end with ". ")
