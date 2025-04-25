@@ -60,7 +60,6 @@ char *file_to_string(FILE *file) {
 
             // Correctly reallocated the memory
             text.plaintext = temp;
-            // free(temp);
 
             // Push read character back to the file
             ungetc(buffer, file);
@@ -73,6 +72,7 @@ char *file_to_string(FILE *file) {
     char *res = realloc(text.plaintext, text.LEN);
     if (!res) {
         printf("FINAL REALLOCATION ERROR\n");
+        free(text.plaintext);
         return NULL;
     }
     return res;
